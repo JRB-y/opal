@@ -1,3 +1,23 @@
-@extends('layouts.app')
-@section('content')
-@endsection
+<!doctype html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Opal</title>
+
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+</head>
+<body>
+<div id="app" class="container">
+    <b-nav tabs align="center">
+        <b-nav-item :to="{ name: 'dashboard'}">Dashboard</b-nav-item>
+        <b-nav-item :to="{ name: 'products'}">Products</b-nav-item>
+        <b-nav-item>About</b-nav-item>
+        <a href="/" class="back-to-website">Back to website</a>
+    </b-nav>
+    <router-view></router-view>
+</div>
+<script src="{{ asset('js/admin.js') }}"></script>
+</body>
+</html>

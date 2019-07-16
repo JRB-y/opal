@@ -16,4 +16,11 @@ Route::get('/', function () {
 });
 
 
+Route::get('products-grid/{offset}', 'Products\ProductsController@productGrid');
 Route::resource('products', 'Products\ProductsController');
+Route::post('products/update', 'Products\ProductsController@update');
+Route::post('products/delete', 'Products\ProductsController@delete');
+Route::get('/admin', 'AdminController@dashboard')->middleware('auth');
+Route::post('/products/count', 'Products\ProductsController@countProducts');
+Route::get('/home', 'HomeController@index')->name('home');
+Auth::routes();

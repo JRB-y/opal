@@ -4,8 +4,13 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>Opal</title>
+        <link rel="shortcut icon" href="{{ asset('/favicon.ico') }}" />
 
+        <meta charset="UTF-8">
+        <meta name="description" content="Opal Creation.">
+        <meta name="keywords" content="Opal,Creation,Jowallery,Design">
+        <meta name="author" content="Opal creation">
+        <title>Opal</title>
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     </head>
     <body>
