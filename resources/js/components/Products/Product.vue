@@ -6,6 +6,7 @@
     </h1>
     <p class="desc">{{product.desc}}</p>
     <div class="product-desc">
+      <img v-img :src="product.image.path" alt="img" class="product-img" />
       <img
         v-img
         v-for="image in product.images"

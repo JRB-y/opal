@@ -4,18 +4,32 @@ namespace App\Http\Controllers\Products;
 
 use App\Image;
 use App\Product;
+use App\MainImage;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Input;
+use App\Http\Controllers\Images\ImagesController;
 
 class ProductsController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * $img
      *
-     * @return \Illuminate\Http\Response
+     * @var undefined
      */
+    public $img;
+
+    /**
+     * __construct
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->img = new ImagesController();
+    }
+
     public function index()
     {
         return Product::with('images')->with('image')->get();
@@ -25,12 +39,7 @@ class ProductsController extends Controller
     {
         return Product::with('images')->with('image')->offset($offset)->limit(12)->get();
     }
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(Request $request)
     {
         $valid = $request->validate([
@@ -45,18 +54,11 @@ class ProductsController extends Controller
             'prix' => 0,
             'image_id' => null
         ]);
-        $image = $this->saveImage(Input::file('image'), $product);
+        $image = $this->img->saveImage(Input::file('image'), $product);
         $product->image_id = $image->id;
         $product->save();
         return $product;
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         return Product::where('id', $id)->with('images')->with('image')->first();
@@ -72,8 +74,9 @@ class ProductsController extends Controller
 
         $product = Product::find($request->id);
         
-        if($request->image != "undefined"){
-            $image = $this->replaceImage(Input::file('image'), $product);
+        if($request->image != "[object Object]"){
+            // $image = $this->replaceImage(Input::file('image'), $product);
+            $image = $this->img->replaceImage(Input::file('image'), $product);
             $product->image_id = $image[0]->id;
             $product->save();
             $image[1]->delete();
@@ -93,58 +96,28 @@ class ProductsController extends Controller
         // delete images of the product from server
         // delete the product
 
+        
+        
         $product = Product::find($request->id);
+        $mainImageId = $product->image_id;
+
+        $product->image_id = null;
+        $product->save();
         $product->delete();
 
-        $imagesToDelete = Image::where('product_id', $request->id)->get();
-        foreach($imagesToDelete as $img){
-            if(File::exists(public_path($img->path))) {
-                File::delete(public_path($img->path));
-            }
-            $img->delete();
+        $mainImage = MainImage::find($mainImageId);
+        if(File::exists(public_path($mainImage->path))) {
+            File::delete(public_path($mainImage->path));
         }
-        
+        $mainImage->delete();
 
+        $this->img->deleteImage($request->id);
         return response()->json( [ 'msg' => $request->id . ' deleted with success !' ] );
     }
 
-    protected function saveImage($image, $product)
-    {
-        $image_name = trim(str_replace(' ', '_', $image->getClientOriginalName()));
-        $path = 'uploads/' . $product->id;
-        $image->move($path, $image_name);
+    
 
-        $imageCreated = Image::create([
-            'path' => '/uploads/'  . $product->id. '/' .$image_name,
-            'product_id' => $product->id
-        ]);
-
-        return $imageCreated;
-    }
-
-    protected function replaceImage($image, $product)
-    {
-        
-        $oldImage = $product->image;
-        if(File::exists(public_path($oldImage->path))) {
-            File::delete(public_path($oldImage->path));
-        }
-
-        
-        
-        $image_name = trim(str_replace(' ', '_', $image->getClientOriginalName()));
-        $path = 'uploads/' . $product->id;
-        $image->move($path, $image_name);
-
-        $imageCreated = Image::create([
-            'path' => '/uploads/'  . $product->id. '/' .$image_name,
-            'product_id' => $product->id
-        ]);
-
-        
-
-        return [$imageCreated, $oldImage];
-    }
+    
 
     public function countProducts()
     {
@@ -152,4 +125,6 @@ class ProductsController extends Controller
         
         return response()->json( $count );
     }
+
+    
 }

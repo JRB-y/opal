@@ -3,7 +3,7 @@
     <figure class="gallery__item" v-for="product in products" :key="product.id">
       <router-link :to="{ name: 'product', params: { id: product.id } }">
         <img
-          :src="product.images[0].path"
+          :src="product.image.path"
           class="gallery__img"
           :alt="product.name"
           @mouseover="mouseover(product)"
@@ -32,13 +32,17 @@ export default {
       });
     },
     mouseover(product) {
-      var tmp = product.images[0].path;
-      product.images[0].path = product.images[1].path;
-      product.images[1].path = tmp;
+      var tmp = product.image.path;
+      var nextImage =
+        product.image.id != product.images[1].id
+          ? product.images[1].path
+          : product.images[0].path;
+      product.image.path = nextImage;
+      nextImage = tmp;
     },
     mouseleave(product) {
-      var tmp = product.images[0].path;
-      product.images[0].path = product.images[1].path;
+      var tmp = product.image.path;
+      product.image.path = product.images[1].path;
       product.images[1].path = tmp;
     },
     scroll() {

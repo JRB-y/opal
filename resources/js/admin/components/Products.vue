@@ -24,7 +24,10 @@
       </template>
       <template slot="id" slot-scope="data">
         <i class="fa fa-trash delete-icon" @click="toggleModal(data.value)"></i>
-        <router-link :to="{ name: 'editProduct', params: { id: data.value } }">
+        <router-link
+          :to="{ name: 'editProduct', params: { id: data.value } }"
+          style="display: inherit;"
+        >
           <i class="fa fa-edit edit-icon"></i>
         </router-link>
         <!-- <b-button id="show-btn" @click="$bvModal.show('bv-modal-example')">Open Modal</b-button> -->
