@@ -32,12 +32,14 @@ class ProductsController extends Controller
 
     public function index()
     {
-        return Product::with('images')->with('image')->get();
+        return Product::orderBy('created_at', 'desc')->with('images', 'image')->get();
     }
 
     public function productGrid($offset)
     {
-        return Product::with('images')->with('image')->offset($offset)->limit(12)->get();
+        return Product::orderBy('created_at', 'desc')
+            ->with('images', 'image')
+            ->offset($offset)->limit(12)->get();
     }
 
     public function store(Request $request)
@@ -63,7 +65,7 @@ class ProductsController extends Controller
     {
         return Product::where('id', $id)->with('images')->with('image')->first();
     }
-    
+
     public function update(Request $request)
     {
         $valid = $request->validate([
@@ -73,8 +75,8 @@ class ProductsController extends Controller
         ]);
 
         $product = Product::find($request->id);
-        
-        if($request->image != "[object Object]"){
+
+        if ($request->image != "[object Object]") {
             // $image = $this->replaceImage(Input::file('image'), $product);
             $image = $this->img->replaceImage(Input::file('image'), $product);
             $product->image_id = $image[0]->id;
@@ -83,21 +85,13 @@ class ProductsController extends Controller
         }
 
 
-        if($product->update($request->all())){
-            return response()->json( [ 'msg' => $product->name . ' updated with sucess !' ] );
+        if ($product->update($request->all())) {
+            return response()->json(['msg' => $product->name . ' updated with sucess !']);
         }
-        
     }
 
     public function delete(Request $request)
     {
-        // find the product
-        // delete images of the product from DB
-        // delete images of the product from server
-        // delete the product
-
-        
-        
         $product = Product::find($request->id);
         $mainImageId = $product->image_id;
 
@@ -106,25 +100,23 @@ class ProductsController extends Controller
         $product->delete();
 
         $mainImage = MainImage::find($mainImageId);
-        if(File::exists(public_path($mainImage->path))) {
+        if (File::exists(public_path($mainImage->path))) {
             File::delete(public_path($mainImage->path));
         }
         $mainImage->delete();
 
         $this->img->deleteImage($request->id);
-        return response()->json( [ 'msg' => $request->id . ' deleted with success !' ] );
+        return response()->json(['msg' => $request->id . ' deleted with success !']);
     }
 
-    
 
-    
+
+
 
     public function countProducts()
     {
         $count = Product::count();
-        
-        return response()->json( $count );
-    }
 
-    
+        return response()->json($count);
+    }
 }
