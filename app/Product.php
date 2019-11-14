@@ -14,7 +14,8 @@ class Product extends Model
         return $this->hasMany(Image::class);
     }
 
-    public function image(){
+    public function image()
+    {
         return $this->belongsTo(MainImage::class);
     }
 
@@ -22,5 +23,4 @@ class Product extends Model
     {
         return $this->hasOne(Image::class);
     }
-
 }
